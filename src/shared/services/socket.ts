@@ -29,17 +29,17 @@ socket.on("chat:new-message", ({ chatId, message }) => {
   });
 });
 
-socket.on("user:online", () => {
-  // setQueryDataWithPartialQueryKey({
-  //   queryClient,
-  //   path: "/api/chats/{id}",
-  //   method: "get",
-  //   updater(prev) {
-  //     if (!prev) return prev;
-  //     return {
-  //       ...prev,
-  //       messages: [...prev.messages, message],
-  //     };
-  //   },
-  // });
-});
+// socket.on("user:online", () => {
+// setQueryDataWithPartialQueryKey({
+//   queryClient,
+//   path: "/api/chats/{id}",
+//   method: "get",
+//   updater(prev) {
+//     if (!prev) return prev;
+//     return {
+//       ...prev,
+//       messages: [...prev.messages, message],
+//     };
+//   },
+// });
+// });

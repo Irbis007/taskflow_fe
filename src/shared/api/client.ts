@@ -24,7 +24,7 @@ const authMiddleware = createAuthMiddleware({
     state.setToken(newToken);
     useAuthStore.setState({ token: newToken });
   },
-  refreshUrl: "http://localhost:5000/api/auth/refetch",
+  refreshUrl: `${BASE_URL}/api/auth/refetch`,
   onAuthFailure: () => {
     useAuthStore.persist.rehydrate();
     const state = useAuthStore.getState();
