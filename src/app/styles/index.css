@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@import './calendar.css';
+
+@theme {
+  --color-base: #0f1117;
+  --color-surface: #1a1d27;
+  --color-elevated: #22263a;
+  --color-primary: #f0f2f8;
+  --color-secondary: #8b90a7;
+  --color-muted: #555a72;
+  --color-accent: #6c63ff;
+  --color-purple: #6c63ff;
+  --color-success: #4fd1a5;
+  --color-warning: #f59e0b;
+  --color-danger: #e55353;
+  --color-default: #ffffff20;
+}
+
+:root {
+  --accent-rgb: 108 99 255;
+  --purple-rgb: 108 99 255;
+  --success-rgb: 79 209 165;
+  --warning-rgb: 245 158 11;
+  --danger-rgb: 229 83 83;
+  --blue-rgb: 48 190 250;
+  --pink-rgb: 255 96 242;
+}
+
+:root:has(.accent-green) {
+  --accent-rgb: 79 209 165;
+  --color-accent: #4fd1a5;
+}
+:root:has(.accent-red) {
+  --accent-rgb: 229 83 83;
+  --color-accent: #e55353;
+}
+:root:has(.accent-orange) {
+  --accent-rgb: 245 158 11;
+  --color-accent: #f59e0b;
+}
+:root:has(.accent-pink) {
+  --accent-rgb: 255 96 242;
+  --color-accent: #ff60f2;
+}
+:root:has(.accent-blue) {
+  --accent-rgb: 48 190 250;
+  --color-accent: #30befa;
+}
+
+:root:has(.theme-white) {
+  --color-base: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-elevated: #f0f0f5;
+  --color-primary: #111118;
+  --color-secondary: #5c5c72;
+  --color-muted: #a0a0b8;
+  --color-default: #e4e4ee;
+}
+
+@source inline("bg-success bg-accent bg-muted bg-warning bg-danger");
+
+.content-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.link {
+  color: var(--color-accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
+}
