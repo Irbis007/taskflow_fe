@@ -7,6 +7,7 @@ import { queryClient } from "../../app/config";
 useAuthStore.persist.rehydrate();
 const state = useAuthStore.getState();
 export const socket = io(BASE_URL, {
+  withCredentials: true,
   auth: {
     user: state.user,
   },
