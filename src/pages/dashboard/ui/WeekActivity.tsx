@@ -26,7 +26,7 @@ export function WeekActivity() {
       </div>
       <div className="space-y-2 mt-3">
         {Object.entries(activity).map(([key, value]) => (
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center" key={key}>
             <div className="w-10 text-muted">{key}</div>
             <div className="relative rounded-lg w-full bg-elevated h-2 overflow-hidden">
               <div

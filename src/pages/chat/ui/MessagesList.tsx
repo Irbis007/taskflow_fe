@@ -1,7 +1,9 @@
+import { $userHooks } from "@entities/user/api";
 import { SearchInput, Spinner } from "@shared/ui";
 import { useState } from "react";
-import { $userHooks } from "@entities/user/api";
 import { useChatStore } from "../model";
+import { socket } from "@shared/services";
+import { useAuthStore } from "@shared/models";
 
 const groups = [
   {
@@ -81,35 +83,15 @@ export default function MessagesList() {
             </div>
           ) : (
             chats.chats.map((item, i) => {
-              // const chatName = `${item.name} ${item.surname.charAt(0)}`;
-              console.log(item)
-              const id = item.chatId;
               return (
-                <div
+                <ChatItem
+                  {...item}
                   key={i}
-                  onClick={() => {
-                    if (id === null) {
-                      createChat({members: [item.companion.id]})
-                    } else {
-                      setActiveChat(id);
-                    }
-                  }}
-                  className={`flex p-2 items-center gap-2 w-full hover:bg-accent/10 cursor-pointer border-l-4
-                ${activeChat === id ? "bg-accent/10 border-accent" : "border-transparent "}`}
-                >
-                  <div className="w-11 h-11 shrink-0 flex justify-center items-center rounded-full bg-accent/20 text-lg text-accent"></div>
-                  <div className="w-full">
-                    <div className="flex justify-between">
-                      <div className="">{item.chatName}</div>
-                      <div className="text-muted text-sm">
-                        {/* {item.lastMessageTime} */}
-                      </div>
-                    </div>
-                    <div className="truncate w-50 text-sm text-secondary">
-                      {/* {item.lastMessage} */}
-                    </div>
-                  </div>
-                </div>
+                  isActive={item.chatId === activeChat}
+                  setActiveChat={setActiveChat}
+                  companionId={item.companion.id}
+                  createChat={(chatId) => createChat({ members: [chatId] })}
+                />
               );
             })
           )}
@@ -118,3 +100,62 @@ export default function MessagesList() {
     </div>
   );
 }
+
+type ChatItemProps = {
+  isActive: boolean;
+  setActiveChat: (val: string) => void;
+  chatId: string | null;
+  chatName: string;
+  companionId: string;
+  createChat: (val: string) => void;
+};
+
+const ChatItem = ({
+  isActive,
+  setActiveChat,
+  chatId,
+  chatName,
+  companionId,
+  createChat,
+}: ChatItemProps) => {
+  const user = useAuthStore((state) => state.user);
+  const [isOnline, setIsOnline] = useState(false);
+
+  socket.on("user:online", ({ userId, isOnline }) => {
+    console.log('isOnline', userId, isOnline)
+    if (user?.id === userId) {
+      setIsOnline(isOnline);
+    }
+  });
+
+  return (
+    <div
+      onClick={() => {
+        if (chatId === null) {
+          createChat(companionId);
+        } else {
+          setActiveChat(chatId);
+        }
+      }}
+      className={`flex p-2 items-center gap-2 w-full hover:bg-accent/10 cursor-pointer border-l-4
+      ${isActive ? "bg-accent/10 border-accent" : "border-transparent "}`}
+    >
+      <div className="relative w-11 h-11 shrink-0 flex justify-center items-center rounded-full bg-accent/20 text-lg text-accent">
+        <div
+          className={`absolute right-0.5 bottom-0.5 w-2 h-2 rounded-full ${isOnline ? "bg-success" : "bg-muted"}`}
+        ></div>
+      </div>
+      <div className="w-full">
+        <div className="flex justify-between">
+          <div className="">{chatName}</div>
+          <div className="text-muted text-sm">
+            {/* {item.lastMessageTime} */}
+          </div>
+        </div>
+        <div className="truncate w-50 text-sm text-secondary">
+          {/* {item.lastMessage} */}
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -35,11 +35,12 @@ export function TagsSelect({
   );
   const filteredTags = tags?.filter((t) => t.name.includes(value)) || [];
 
-  useEffect(() => {
-    if (tags) {
-      setSelectedTags(tags.filter((t) => defaultValue.includes(t.id)) || []);
-    }
-  }, [tags, defaultValue]);
+  // const isSame = compareArrays(tags.map(tag => tag.id), defaultValue)
+  // console.log(!isSame && !!defaultValue.length)
+  // if (!isSame && defaultValue.length) {
+  //   console.log(isSame)
+  //   setSelectedTags(tags.filter((t) => defaultValue.includes(t.id)) || []);
+  // }
 
   const selectRef = useRef<HTMLDivElement | null>(null);
 
@@ -81,7 +82,7 @@ export function TagsSelect({
     <div className="relative">
       <div className="flex gap-2 flex-wrap">
         {(onSubmitByClose ? selectedTags : tags).map((tag) => {
-          const isSelected = selectedTags.find(t => t.id == tag.id)
+          const isSelected = selectedTags.find((t) => t.id == tag.id);
           return (
             <div
               className={`py-1 px-3 rounded-full border text-sm cursor-pointer transition-colors 

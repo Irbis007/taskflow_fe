@@ -65,8 +65,8 @@ export function CalendarPicker({
           <div className="p-4 border border-default">
             <Calendar
               onChange={(val) => {
-                onChange(val ? val.toString() : '')
-                setIsModal(false)
+                onChange(val ? val.toString() : "");
+                setIsModal(false);
               }}
               value={value}
               prevLabel={<IoIosArrowBack />}

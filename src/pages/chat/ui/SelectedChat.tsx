@@ -21,15 +21,12 @@ export function SelectedChat() {
   const [messageInp, setMessageInp] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  socket.on("typing:start", (userId, chatId) => {
-    console.log(userId);
+  socket.on("typing:start", ({ userId, chatId }) => {
     if (chatData?.chatId === chatId && userId != user?.id) {
       setIsTyping(true);
-      console.log("start");
     }
   });
   socket.on("typing:end", ({ userId, chatId }) => {
-    console.log("end");
     if (chatData?.chatId === chatId && userId != user?.id) {
       setIsTyping(false);
     }
@@ -38,7 +35,6 @@ export function SelectedChat() {
   const typing = !!messageInp.length;
 
   useEffect(() => {
-    console.log("sdvsdv");
     if (typing) {
       socket.emit("typing:start", {
         companionId: chatData?.companion.id,
