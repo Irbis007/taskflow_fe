@@ -6,7 +6,7 @@ import { FaRegSmile } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { Input, Spinner } from "@shared/ui";
 import { socket } from "@shared/services";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { $userHooks } from "@entities/user/api";
 import { useAuthStore } from "@shared/models";
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
@@ -20,6 +20,21 @@ export function SelectedChat() {
 
   const [messageInp, setMessageInp] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  function scrollToBottom() {
+    if (bottomRef.current) {
+      bottomRef.current?.scrollIntoView({
+        behavior: "instant",
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (!isChatLoading) scrollToBottom();
+  }, [isChatLoading]);
 
   socket.on("typing:start", ({ userId, chatId }) => {
     if (chatData?.chatId === chatId && userId != user?.id) {
@@ -127,6 +142,7 @@ export function SelectedChat() {
             </div>
           </div>
         )}
+        <div ref={bottomRef}></div>
       </div>
       <div className="shrink-0 w-full px-4 py-2 bg-surface">
         <div className="flex items-center gap-2 px-4 py-2 border border-default rounded-lg bg-elevated">
@@ -142,18 +158,28 @@ export function SelectedChat() {
             className="grow"
             placeholder="Message..."
           />
-          <div
-            onClick={() =>
-              socket.emit("message:send", {
-                message: messageInp,
-                chatId: chatData.chatId,
-              })
-            }
+          <button
+            onClick={() => {
+              setIsLoading(true);
+              socket.emit(
+                "message:send",
+                {
+                  message: messageInp,
+                  chatId: chatData.chatId,
+                },
+                () => {
+                  scrollToBottom();
+                  setIsLoading(false);
+                  setMessageInp("");
+                },
+              );
+            }}
+            disabled={isLoading}
             className="flex justify-center items-center w-max cursor-pointer bg-accent hover:bg-accent/80 p-1.5
            text-primary transition-colors duration-300 rounded-lg"
           >
-            <FiSend size={20} />
-          </div>
+            {isLoading ? <Spinner /> : <FiSend size={20} />}
+          </button>
         </div>
       </div>
     </div>

@@ -35,13 +35,6 @@ export function TagsSelect({
   );
   const filteredTags = tags?.filter((t) => t.name.includes(value)) || [];
 
-  // const isSame = compareArrays(tags.map(tag => tag.id), defaultValue)
-  // console.log(!isSame && !!defaultValue.length)
-  // if (!isSame && defaultValue.length) {
-  //   console.log(isSame)
-  //   setSelectedTags(tags.filter((t) => defaultValue.includes(t.id)) || []);
-  // }
-
   const selectRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
