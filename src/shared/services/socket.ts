@@ -13,8 +13,7 @@ export const socket = io(BASE_URL, {
   },
 });
 
-socket.on("chat:new-message", ({ chatId, message }) => {
-  console.log(chatId, message.id);
+socket.on("chat:new-message", ({ message }) => {
   setQueryDataWithPartialQueryKey({
     queryClient,
     path: "/api/chats/{id}",

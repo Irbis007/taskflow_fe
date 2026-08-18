@@ -19,3 +19,5 @@ export type EntityType = components["schemas"]["EntityType"];
 export type Tag = components["schemas"]["Tag"];
 export type Comment = components["schemas"]["Comment"];
 export type Activity = components["schemas"]["Activity"];
+export type ChatItem = components["schemas"]["ChatItem"];
+export type Chat = components["schemas"]["Chat"];

@@ -882,15 +882,7 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            chats: {
-                                createdAt: string;
-                                updatedAt: string;
-                                chatName: string;
-                                lasMessage: string;
-                                lastMessageDate: string;
-                                chatId: string;
-                                companion: components["schemas"]["UserOutput"];
-                            }[];
+                            chats: components["schemas"]["ChatItem"][];
                         };
                     };
                 };
@@ -918,21 +910,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            companion: components["schemas"]["UserOutput"];
-                            messages: {
-                                message: string;
-                                author: components["schemas"]["UserOutput"];
-                                createdAt: string;
-                                updatedAt: string;
-                                /** @enum {string} */
-                                status: "read" | "sent" | "delivered";
-                                chatId: string;
-                                id: string;
-                            }[];
-                            chatName: string;
-                            chatId: string;
-                        };
+                        "application/json": components["schemas"]["Chat"];
                     };
                 };
             };
@@ -969,21 +947,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            companion: components["schemas"]["UserOutput"];
-                            messages: {
-                                message: string;
-                                author: components["schemas"]["UserOutput"];
-                                createdAt: string;
-                                updatedAt: string;
-                                /** @enum {string} */
-                                status: "read" | "sent" | "delivered";
-                                chatId: string;
-                                id: string;
-                            }[];
-                            chatName: string;
-                            chatId: string;
-                        };
+                        "application/json": components["schemas"]["Chat"];
                     };
                 };
             };
@@ -1265,6 +1229,39 @@ export interface components {
             };
             team: components["schemas"]["UserOutput"][];
             recentActivity: components["schemas"]["ActivityOutput"][];
+        };
+        ChatItem: {
+            createdAt: string;
+            updatedAt: string;
+            chatName: string;
+            lastMessage: {
+                message: string;
+                author: components["schemas"]["UserOutput"];
+                createdAt: string;
+                updatedAt: string;
+                /** @enum {string} */
+                status: "read" | "sent" | "delivered";
+                chatId: string;
+                id: string;
+            };
+            lastMessageDate: string;
+            chatId: string;
+            companion: components["schemas"]["UserOutput"];
+        };
+        Chat: {
+            companion: components["schemas"]["UserOutput"];
+            messages: {
+                message: string;
+                author: components["schemas"]["UserOutput"];
+                createdAt: string;
+                updatedAt: string;
+                /** @enum {string} */
+                status: "read" | "sent" | "delivered";
+                chatId: string;
+                id: string;
+            }[];
+            chatName: string;
+            chatId: string;
         };
         TagOutput: {
             name: string;

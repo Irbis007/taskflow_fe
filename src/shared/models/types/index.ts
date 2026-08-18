@@ -31,4 +31,6 @@ export type {
   Activity,
   KanbanTask,
   ProjectPut,
+  ChatItem,
+  Chat,
 } from "./types";

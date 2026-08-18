@@ -172,13 +172,13 @@ export function ProjectForm({
                 <div className="flex gap-2">
                   {iconLabels.map((item) => (
                     <div
+                      key={item}
                       onClick={() => field.handleChange(item)}
                       className={`border p-2 rounded-lg cursor-pointer hover:bg-accent/20 ${
                         field.state.value === item
                           ? "border-accent text-accent bg-accent/20"
                           : "border-default text-primary bg-primary/20"
                       }`}
-                      key={item}
                     >
                       {getIconByLabel(item)}
                     </div>
@@ -195,12 +195,12 @@ export function ProjectForm({
                 <div className="flex">
                   {colors.map((item) => (
                     <div
+                      key={item}
                       className={`p-0.5 border-2 rounded-full ${item === field.state.value ? "border-primary" : "border-transparent"}`}
                     >
                       <div
                         onClick={() => field.handleChange(item)}
                         className={`w-8 h-8 rounded-full cursor-pointer hover:bg-accent/20 `}
-                        key={item}
                         style={{
                           background: `rgb(var(--${item}-rgb))`,
                         }}

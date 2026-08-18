@@ -1,9 +1,10 @@
 import { $userHooks } from "@entities/user/api";
 import { SearchInput, Spinner } from "@shared/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useChatStore } from "../model";
 import { socket } from "@shared/services";
-import { useAuthStore } from "@shared/models";
+import { ChatItem as ChatItemType, useAuthStore } from "@shared/models";
+import { getLastMessageDate } from "@shared/utils";
 
 const groups = [
   {
@@ -85,18 +86,18 @@ export default function MessagesList() {
             chats.chats.map((item, i) => {
               return (
                 <ChatItem
-                  {...item}
                   key={i}
                   isActive={item.chatId === activeChat}
                   setActiveChat={setActiveChat}
-                  companionId={item.companion.id}
                   createChat={(chatId) => createChat({ members: [chatId] })}
+                  chatData={item}
                 />
               );
             })
           )}
         </div>
       </div>
+
     </div>
   );
 }
@@ -104,35 +105,74 @@ export default function MessagesList() {
 type ChatItemProps = {
   isActive: boolean;
   setActiveChat: (val: string) => void;
-  chatId: string | null;
-  chatName: string;
-  companionId: string;
   createChat: (val: string) => void;
+  chatData: ChatItemType;
 };
 
 const ChatItem = ({
   isActive,
   setActiveChat,
-  chatId,
-  chatName,
-  companionId,
   createChat,
+  chatData: { chatId, chatName, companion, ...props },
 }: ChatItemProps) => {
   const user = useAuthStore((state) => state.user);
   const [isOnline, setIsOnline] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
-  socket.on("user:online", ({ userId, isOnline }) => {
-    console.log('isOnline', userId, isOnline)
-    if (user?.id === userId) {
-      setIsOnline(isOnline);
-    }
-  });
+  useEffect(() => {
+    const onOnline = ({
+      userId,
+      isOnline: isUserOnline,
+    }: {
+      userId: string;
+      isOnline: boolean;
+    }) => {
+      if (companion.id === userId && isOnline != isUserOnline) {
+        setIsOnline(isUserOnline);
+      }
+    };
+    socket.on("user:online", onOnline);
+    return () => {
+      socket.off("user:online", onOnline);
+    };
+  }, [isOnline, companion.id]);
+
+  useEffect(() => {
+    const onTypingStart = ({
+      chatId: companionChatId,
+      userId,
+    }: {
+      chatId: string;
+      userId: string;
+    }) => {
+      if (companionChatId === chatId && userId !== user?.id) {
+        setIsTyping(true);
+      }
+    };
+    const onTypingEnd = ({
+      chatId: companionChatId,
+      userId,
+    }: {
+      chatId: string;
+      userId: string;
+    }) => {
+      if (companionChatId === chatId && userId !== user?.id) {
+        setIsTyping(false);
+      }
+    };
+    socket.on("typing:start", onTypingStart);
+    socket.on("typing:end", onTypingEnd);
+    return () => {
+      socket.off("typing:start", onTypingStart);
+      socket.off("typing:end", onTypingEnd);
+    };
+  }, [isOnline, companion.id, user?.id, chatId]);
 
   return (
     <div
       onClick={() => {
         if (chatId === null) {
-          createChat(companionId);
+          createChat(companion.id);
         } else {
           setActiveChat(chatId);
         }
@@ -142,18 +182,19 @@ const ChatItem = ({
     >
       <div className="relative w-11 h-11 shrink-0 flex justify-center items-center rounded-full bg-accent/20 text-lg text-accent">
         <div
-          className={`absolute right-0.5 bottom-0.5 w-2 h-2 rounded-full ${isOnline ? "bg-success" : "bg-muted"}`}
+          className={`absolute right-0.5 bottom-0.5 rounded-full ${isOnline ? "bg-success w-2.5 h-2.5 animate-pulse" : "bg-muted w-2 h-2"}
+            `}
         ></div>
       </div>
       <div className="w-full">
         <div className="flex justify-between">
           <div className="">{chatName}</div>
           <div className="text-muted text-sm">
-            {/* {item.lastMessageTime} */}
+            {getLastMessageDate(props?.lastMessage?.updatedAt)}
           </div>
         </div>
         <div className="truncate w-50 text-sm text-secondary">
-          {/* {item.lastMessage} */}
+          {isTyping ? "Typing..." : props?.lastMessage?.message || ""}
         </div>
       </div>
     </div>

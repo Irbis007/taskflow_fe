@@ -29,6 +29,8 @@ export type {
   Activity,
   KanbanTask,
   ProjectPut,
+  Chat,
+  ChatItem,
 } from "./types";
 export { TaskStatus } from "./types";
 
