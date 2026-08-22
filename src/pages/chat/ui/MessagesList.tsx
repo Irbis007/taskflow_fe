@@ -36,6 +36,20 @@ export default function MessagesList() {
   const activeChat = useChatStore((state) => state.activeChat);
   const setActiveChat = useChatStore((state) => state.setActiveChat);
   const [search, setSearch] = useState("");
+  const [usersOnline, setUsersOnline] = useState<string[]>([]);
+
+  useEffect(() => {
+    const onOnlineUsers = (usersIds: string[]) => {
+      console.log(usersIds)
+      setUsersOnline(usersIds);
+    };
+
+    socket.on("users:online", onOnlineUsers);
+
+    return () => {
+      socket.off("users:online", onOnlineUsers);
+    };
+  }, []);
 
   return (
     <div className="w-70 border-r border-default">
@@ -86,6 +100,7 @@ export default function MessagesList() {
             chats.chats.map((item, i) => {
               return (
                 <ChatItem
+                  isOnline={usersOnline.includes(item.companion.id)}
                   key={i}
                   isActive={item.chatId === activeChat}
                   setActiveChat={setActiveChat}
@@ -97,13 +112,13 @@ export default function MessagesList() {
           )}
         </div>
       </div>
-
     </div>
   );
 }
 
 type ChatItemProps = {
   isActive: boolean;
+  isOnline: boolean;
   setActiveChat: (val: string) => void;
   createChat: (val: string) => void;
   chatData: ChatItemType;
@@ -111,12 +126,13 @@ type ChatItemProps = {
 
 const ChatItem = ({
   isActive,
+  isOnline: defIsOnline,
   setActiveChat,
   createChat,
   chatData: { chatId, chatName, companion, ...props },
 }: ChatItemProps) => {
   const user = useAuthStore((state) => state.user);
-  const [isOnline, setIsOnline] = useState(false);
+  const [isOnline, setIsOnline] = useState(defIsOnline);
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
