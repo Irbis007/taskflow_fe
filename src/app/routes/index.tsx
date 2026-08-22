@@ -3,6 +3,7 @@ import { SecondaryLayout } from "../layout";
 import { URLS } from "@shared/consts";
 import {
   Chat,
+  SelectedChat,
   Dashboard,
   Kanban,
   Projects,
@@ -57,6 +58,12 @@ export const router = createBrowserRouter([
       {
         path: URLS.chat,
         element: <Chat />,
+        children: [
+          {
+            path: `${URLS.chat}/:chatId`,
+            element: <SelectedChat />,
+          },
+        ],
       },
       {
         path: `${URLS.users}`,

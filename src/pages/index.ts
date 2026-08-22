@@ -1,4 +1,4 @@
-export { Chat } from "./chat";
+export { Chat, SelectedChat } from "./chat";
 export { Dashboard } from "./dashboard";
 export { Kanban } from "./kanban";
 export { Users } from "./users";

@@ -1,10 +1,11 @@
 import { $userHooks } from "@entities/user/api";
 import { SearchInput, Spinner } from "@shared/ui";
 import { useEffect, useState } from "react";
-import { useChatStore } from "../model";
 import { socket } from "@shared/services";
 import { ChatItem as ChatItemType, useAuthStore } from "@shared/models";
 import { getLastMessageDate } from "@shared/utils";
+import { useNavigate, useParams } from "react-router-dom";
+import { URLS } from "@shared/consts";
 
 const groups = [
   {
@@ -33,10 +34,13 @@ const groups = [
 export default function MessagesList() {
   const { data: chats, isLoading: isUsersLoading } = $userHooks.getForChat();
   const { mutateAsync: createChat } = $userHooks.createChat();
-  const activeChat = useChatStore((state) => state.activeChat);
-  const setActiveChat = useChatStore((state) => state.setActiveChat);
+
+  const chatId = useParams()?.chatId || ""
+
   const [search, setSearch] = useState("");
   const [usersOnline, setUsersOnline] = useState<string[]>([]);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const onOnlineUsers = (usersIds: string[]) => {
@@ -102,8 +106,8 @@ export default function MessagesList() {
                 <ChatItem
                   isOnline={usersOnline.includes(item.companion.id)}
                   key={i}
-                  isActive={item.chatId === activeChat}
-                  setActiveChat={setActiveChat}
+                  isActive={item.chatId === chatId}
+                  setActiveChat={(id) => navigate(`${URLS.chat}/${id}`)}
                   createChat={(chatId) => createChat({ members: [chatId] })}
                   chatData={item}
                 />

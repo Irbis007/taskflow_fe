@@ -1,4 +1,4 @@
-import { useChatStore } from "../model";
+
 import { IoIosSearch } from "react-icons/io";
 import { BsPinAngle, BsThreeDots } from "react-icons/bs";
 import { LuPaperclip } from "react-icons/lu";
@@ -10,13 +10,13 @@ import { useEffect, useRef, useState } from "react";
 import { $userHooks } from "@entities/user/api";
 import { useAuthStore } from "@shared/models";
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
+import { useParams } from "react-router-dom";
 
 export function SelectedChat() {
-  const activeChat = useChatStore((state) => state.activeChat);
-  const activeChatId = activeChat || "";
+  const chatId = useParams()?.chatId || ""
   const user = useAuthStore((state) => state.user);
   const { data: chatData, isLoading: isChatLoading } =
-    $userHooks.getChat(activeChatId);
+    $userHooks.getChat(chatId);
 
   const [messageInp, setMessageInp] = useState("");
   const [isTyping, setIsTyping] = useState(false);

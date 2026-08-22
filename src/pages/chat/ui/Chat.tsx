@@ -1,11 +1,12 @@
+import { Outlet, useParams } from "react-router-dom";
 import MessagesList from "./MessagesList";
-import { SelectedChat } from "./SelectedChat";
 
 export function Chat() {
+  const chatId = useParams().chatId;
   return (
     <div className="flex w-full h-full">
       <MessagesList />
-      <SelectedChat />
+      {chatId ? <Outlet /> : "Select Chat"}
     </div>
   );
 }
