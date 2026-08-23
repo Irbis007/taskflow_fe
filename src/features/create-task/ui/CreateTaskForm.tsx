@@ -228,7 +228,7 @@ export function CreateTaskForm({ isOpen, setIsOpen, defaultData }: Props) {
               children={(field) => (
                 <div className="flex items-center gap-1">
                   {users.map((item) => {
-                    const initials = getInitials(item.name, item.surname);
+                    const initials = getInitials(item);
                     const isSelected = field.state.value.includes(item.id);
                     return (
                       <div

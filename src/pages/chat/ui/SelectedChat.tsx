@@ -64,11 +64,13 @@ export function SelectedChat() {
   }, [typing, chatData]);
 
   if (isChatLoading) {
-    return <Spinner center size={52}/>;
+    return <Spinner center size={52} />;
   }
   if (!chatData) {
     return "Chat";
   }
+
+  const initials = getInitials(chatData.companion);
 
   return (
     <div className="grow flex flex-col">
@@ -76,7 +78,9 @@ export function SelectedChat() {
         <div className="flex gap-2 items-center">
           <div
             className={`flex items-center justify-center w-11 h-11 rounded-full text-accent bg-accent/20`}
-          ></div>
+          >
+            {initials}
+          </div>
           <div className="">{chatData.chatName}</div>
         </div>
         <div className="flex items-center gap-2">
@@ -93,7 +97,7 @@ export function SelectedChat() {
       </div>
       <div className="space-y-4 p-6 w-full grow overflow-auto">
         {chatData.messages.map((item) => {
-          const initials = getInitials(item.author.name, item.author.surname);
+          const initials = getInitials(item.author);
           const isMine = item.author.id === user?.id;
           return (
             <div

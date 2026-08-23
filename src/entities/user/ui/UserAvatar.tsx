@@ -9,13 +9,13 @@ interface Props {
 }
 
 export function UserAvatar({ user, className, size = "small" }: Props) {
-  const userInitials = getInitials(user.name, user.surname);
+  const userInitials = getInitials(user);
 
   return (
     <div
       className={twMerge(
         `flex items-center justify-center w-max p-1 rounded-full bg-warning/20 text-warning 
-        ${size === "large" ? "w-20 h-20 text-2xl" : size === 'medium' ? "w-12 h-12" :  "text-xs "}`,
+        ${size === "large" ? "w-20 h-20 text-2xl" : size === "medium" ? "w-12 h-12" : "text-xs "}`,
         className,
       )}
     >

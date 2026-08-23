@@ -243,7 +243,7 @@ export function ProjectForm({
                   children={(field) => (
                     <>
                       {users.map((item) => {
-                        const initials = getInitials(item.name, item.surname);
+                        const initials = getInitials(item);
                         const isSelected = field.state.value.includes(item.id);
                         return (
                           <div

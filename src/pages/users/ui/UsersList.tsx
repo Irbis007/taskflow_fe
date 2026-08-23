@@ -53,7 +53,7 @@ export function UsersList() {
         </div>
         <div className="mt-1">
           {filteredUsers.map((item) => {
-            const initials = getInitials(item.name, item.surname);
+            const initials = getInitials(item);
             const name = `${item.name} ${item.surname.charAt(1).toLowerCase()}`;
             return (
               <div
