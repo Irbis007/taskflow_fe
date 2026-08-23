@@ -1,4 +1,3 @@
-
 import { IoIosSearch } from "react-icons/io";
 import { BsPinAngle, BsThreeDots } from "react-icons/bs";
 import { LuPaperclip } from "react-icons/lu";
@@ -11,9 +10,10 @@ import { $userHooks } from "@entities/user/api";
 import { useAuthStore } from "@shared/models";
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
 import { useParams } from "react-router-dom";
+import { getInitials } from "@shared/utils";
 
 export function SelectedChat() {
-  const chatId = useParams()?.chatId || ""
+  const chatId = useParams()?.chatId || "";
   const user = useAuthStore((state) => state.user);
   const { data: chatData, isLoading: isChatLoading } =
     $userHooks.getChat(chatId);
@@ -34,7 +34,7 @@ export function SelectedChat() {
 
   useEffect(() => {
     if (!isChatLoading) scrollToBottom();
-  }, [isChatLoading]);
+  }, [isChatLoading, chatId]);
 
   socket.on("typing:start", ({ userId, chatId }) => {
     if (chatData?.chatId === chatId && userId != user?.id) {
@@ -93,16 +93,17 @@ export function SelectedChat() {
       </div>
       <div className="space-y-4 p-6 w-full grow overflow-auto">
         {chatData.messages.map((item) => {
-          // const initials = getInitials(item.author.name, item.author.surname);
+          const initials = getInitials(item.author.name, item.author.surname);
           const isMine = item.author.id === user?.id;
           return (
             <div
+              key={item.id}
               className={`flex gap-2 ${isMine ? "ml-auto flex-row-reverse" : ""}`}
             >
               <div
                 className={`flex items-center justify-center w-11 h-11 rounded-full ${isMine ? "text-accent bg-accent/20" : "text-success bg-success/20"}`}
               >
-                {/* {initials} */}
+                {initials}
               </div>
               <div className="">
                 <div
