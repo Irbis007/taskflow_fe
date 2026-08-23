@@ -56,7 +56,7 @@ export default function MessagesList() {
   }, []);
 
   return (
-    <div className="w-70 border-r border-default">
+    <div className=" shrink-0 w-70 border-r border-default">
       <div className="py-6 px-4 border-b border-default text-xl font-bold">
         Message
       </div>

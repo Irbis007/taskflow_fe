@@ -64,7 +64,7 @@ export function SelectedChat() {
   }, [typing, chatData]);
 
   if (isChatLoading) {
-    return <Spinner />;
+    return <Spinner center size={52}/>;
   }
   if (!chatData) {
     return "Chat";
