@@ -5,10 +5,7 @@ import {
   replaceItemInArray,
   setQueryDataWithPartialQueryKey,
 } from "@shared/utils";
-import {
-  ParametersQueryType,
-} from "@shared/models/types/generics";
-
+import { ParametersQueryType } from "@shared/models/types/generics";
 
 const useGetUsers = () => {
   return $api.useQuery("get", "/api/users");
@@ -62,53 +59,10 @@ const useGetUser = (id: string) => {
   });
 };
 
-const useGetUsersAvailableForChat = () => {
-  return $api.useQuery("get", "/api/chats");
-};
-
-const getChat = (id: string) => {
-  return $api.useQuery(
-    "get",
-    "/api/chats/{id}",
-    { params: { path: { id } } },
-    { enabled: !!id.length },
-  );
-};
-
-const createChat = () => {
-  const mutation = $api.useMutation("post", "/api/chats");
-  return {
-    ...mutation,
-    mutateAsync: (data: BodyRequestType<"post", "/api/chats">) =>
-      mutation.mutateAsync({ body: data }),
-  };
-};
-
-const useCreateMessage = (id: string) => {
-  const queryClient = useQueryClient();
-  const mutation = $api.useMutation("post", "/api/chats/{id}/messages", {
-    onSuccess(newMessage) {
-      setQueryDataWithPartialQueryKey({
-        queryClient,
-        path: "/api/chats/{id}",
-        method: "get",
-        updater(prev) {
-          if (!prev) return prev;
-
-          return {
-            ...prev,
-            messages: [...prev.messages, newMessage],
-          };
-        },
-      });
-    },
-  });
-
-  return {
-    ...mutation,
-    mutateAsync: (data: BodyRequestType<"post", "/api/chats/{id}/messages">) =>
-      mutation.mutateAsync({ body: data, params: { path: { id } } }),
-  };
+const useGetUsersAvailableForChat = (
+  queryParams: ParametersQueryType<"get", "/api/chats">,
+) => {
+  return $api.useQuery("get", "/api/chats", { params: { query: queryParams } });
 };
 
 export const $userHooks = {
@@ -116,7 +70,4 @@ export const $userHooks = {
   getOne: useGetUser,
   getForChat: useGetUsersAvailableForChat,
   edit: useEditUser,
-  getChat,
-  createChat,
-  createMessage: useCreateMessage,
 };

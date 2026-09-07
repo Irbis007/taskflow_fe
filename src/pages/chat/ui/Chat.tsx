@@ -1,12 +1,12 @@
 import { Outlet, useParams } from "react-router-dom";
-import MessagesList from "./MessagesList";
+import ChatsList from "./ChatsList";
 import { IoChatbubblesOutline } from "react-icons/io5";
 
 export function Chat() {
   const chatId = useParams().chatId;
   return (
     <div className="flex w-full h-full">
-      <MessagesList />
+      <ChatsList />
       {chatId ? (
         <Outlet />
       ) : (

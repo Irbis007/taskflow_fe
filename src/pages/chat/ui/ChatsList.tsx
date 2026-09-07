@@ -1,59 +1,48 @@
 import { $userHooks } from "@entities/user/api";
 import { SearchInput, Spinner } from "@shared/ui";
 import { useEffect, useState } from "react";
-import { socket } from "@shared/services";
 import { ChatItem as ChatItemType, useAuthStore } from "@shared/models";
 import { getLastMessageDate } from "@shared/utils";
 import { useNavigate, useParams } from "react-router-dom";
 import { URLS } from "@shared/consts";
+import { socket } from "@shared/services";
+import { $chatHooks } from "@entities/chat/api";
 
-const groups = [
-  {
-    lastMessage:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste, repellendus!",
-    lastMessageTime: "12:41",
-    groupTitle: "General",
-    id: 1,
-  },
-  {
-    lastMessage:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste, repellendus!",
-    lastMessageTime: "12:41",
-    groupTitle: "Bugs",
-    id: 2,
-  },
-  {
-    lastMessage:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste, repellendus!",
-    lastMessageTime: "12:41",
-    groupTitle: "GeneraDesignl",
-    id: 3,
-  },
-];
-
-export default function MessagesList() {
-  const { data: chats, isLoading: isUsersLoading } = $userHooks.getForChat();
-  const { mutateAsync: createChat } = $userHooks.createChat();
-
-  const chatId = useParams()?.chatId || ""
-
+export default function ChatsList() {
   const [search, setSearch] = useState("");
+  const [querySearch, setQuerySearch] = useState("");
+
+  const { data: chats, isLoading: isUsersLoading } = $userHooks.getForChat({
+    name: querySearch,
+  });
+  const { mutateAsync: createChat } = $chatHooks.createChat();
+
+  const chatId = useParams()?.chatId || "";
+
+
   const [usersOnline, setUsersOnline] = useState<string[]>([]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const onOnlineUsers = (usersIds: string[]) => {
-      console.log(usersIds)
-      setUsersOnline(usersIds);
+    if (!socket) return;
+
+    const handleUsersOnline = (users: string[]) => {
+      console.log("USERS ONLINE:", users);
+      setUsersOnline(users);
     };
 
-    socket.on("users:online", onOnlineUsers);
+    socket.on("users:online", handleUsersOnline);
+
+
+    if (socket.connected) {
+      socket.emit("users:getOnline");
+    }
 
     return () => {
-      socket.off("users:online", onOnlineUsers);
+      socket.off("users:online", handleUsersOnline);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <div className=" shrink-0 w-70 border-r border-default">
@@ -61,14 +50,17 @@ export default function MessagesList() {
         Message
       </div>
       <div className="p-3 border-b border-default">
-        <SearchInput value={search} onChange={setSearch} />
+        <SearchInput value={search} onChange={setSearch} onSearch={() => setQuerySearch(search)}/>
       </div>
       <div className="">
         <div className="p-2 text-secondary text-sm tracking-widest uppercase">
           channels
         </div>
         <div className="mt-1">
-          {groups.map((item, i) => (
+          {
+            // chats.
+          }
+          {/* {groups.map((item, i) => (
             <div
               key={i}
               className={`flex p-2 items-center gap-2 w-full hover:bg-accent/10 cursor-pointer border-l-4 `}
@@ -88,7 +80,7 @@ export default function MessagesList() {
                 </div>
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
       <div className="mt-2">
@@ -100,15 +92,23 @@ export default function MessagesList() {
             <div className="flex items-center justify-center mt-4">
               <Spinner size={32} />
             </div>
+          ) : !!search.length && !chats.chats.length ? (
+            <div className="p-2 text-secondary">
+              There is no users with this name
+            </div>
           ) : (
             chats.chats.map((item, i) => {
               return (
                 <ChatItem
                   isOnline={usersOnline.includes(item.companion.id)}
                   key={i}
-                  isActive={item.chatId === chatId}
+                  isActive={item.id === chatId}
                   setActiveChat={(id) => navigate(`${URLS.chat}/${id}`)}
-                  createChat={(chatId) => createChat({ members: [chatId] })}
+                  createChat={(userId) =>
+                    createChat({ members: [userId] }).then((chat) =>
+                      navigate(`${URLS.chat}/${chat.id}`),
+                    )
+                  }
                   chatData={item}
                 />
               );
@@ -133,27 +133,33 @@ const ChatItem = ({
   isOnline: defIsOnline,
   setActiveChat,
   createChat,
-  chatData: { chatId, chatName, companion, ...props },
+  chatData: { id, chatName, companion, ...props },
 }: ChatItemProps) => {
   const user = useAuthStore((state) => state.user);
   const [isOnline, setIsOnline] = useState(defIsOnline);
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    const onOnline = ({
-      userId,
-      isOnline: isUserOnline,
-    }: {
-      userId: string;
-      isOnline: boolean;
-    }) => {
-      if (companion.id === userId && isOnline != isUserOnline) {
-        setIsOnline(isUserOnline);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsOnline(defIsOnline);
+  }, [defIsOnline]);
+
+  useEffect(() => {
+    const onOnline = ({ userId }: { userId: string }) => {
+      if (companion.id === userId) {
+        setIsOnline(true);
       }
     };
-    socket.on("user:online", onOnline);
+    const onOffline = ({ userId }: { userId: string }) => {
+      if (companion.id === userId) {
+        setIsOnline(false);
+      }
+    };
+    socket?.on("user:online", onOnline);
+    socket?.on("user:offline", onOffline);
     return () => {
-      socket.off("user:online", onOnline);
+      socket?.off("user:online", onOnline);
+      socket?.off("user:offline", onOffline);
     };
   }, [isOnline, companion.id]);
 
@@ -165,7 +171,7 @@ const ChatItem = ({
       chatId: string;
       userId: string;
     }) => {
-      if (companionChatId === chatId && userId !== user?.id) {
+      if (companionChatId === id && userId !== user?.id) {
         setIsTyping(true);
       }
     };
@@ -176,25 +182,24 @@ const ChatItem = ({
       chatId: string;
       userId: string;
     }) => {
-      if (companionChatId === chatId && userId !== user?.id) {
+      if (companionChatId === id && userId !== user?.id) {
         setIsTyping(false);
       }
     };
-    socket.on("typing:start", onTypingStart);
-    socket.on("typing:end", onTypingEnd);
+    socket?.on("typing:start", onTypingStart);
+    socket?.on("typing:end", onTypingEnd);
     return () => {
-      socket.off("typing:start", onTypingStart);
-      socket.off("typing:end", onTypingEnd);
+      socket?.off("typing:start", onTypingStart);
+      socket?.off("typing:end", onTypingEnd);
     };
-  }, [isOnline, companion.id, user?.id, chatId]);
-
+  }, [id, user?.id]);
   return (
     <div
       onClick={() => {
-        if (chatId === null) {
+        if (id === null) {
           createChat(companion.id);
         } else {
-          setActiveChat(chatId);
+          setActiveChat(id);
         }
       }}
       className={`flex p-2 items-center gap-2 w-full hover:bg-accent/10 cursor-pointer border-l-4

@@ -1,30 +1,39 @@
+// socket.ts
 import { BASE_URL } from "@shared/consts";
 import { useAuthStore } from "@shared/models";
-import { setQueryDataWithPartialQueryKey } from "@shared/utils";
 import { io } from "socket.io-client";
-import { queryClient } from "../../app/config";
 
-useAuthStore.persist.rehydrate();
-const state = useAuthStore.getState();
 export const socket = io(BASE_URL, {
   withCredentials: true,
-  auth: {
-    user: state.user,
-  },
+  autoConnect: false,
 });
 
-socket.on("chat:new-message", ({ message }) => {
-  setQueryDataWithPartialQueryKey({
-    queryClient,
-    path: "/api/chats/{id}",
-    method: "get",
-    updater(prev) {
-      if (!prev) return prev;
+function connectSocket(userId: string) {
+  socket.auth = { userId };
+  socket.connect();
+  console.log(userId);
+}
 
-      return {
-        ...prev,
-        messages: [...prev.messages, message],
-      };
-    },
-  });
+function disconnectSocket() {
+  socket.disconnect();
+}
+
+useAuthStore.subscribe((state, prevState) => {
+  const userId = state.user?.id;
+  const prevUserId = prevState.user?.id;
+
+  if (userId && userId !== prevUserId) {
+    connectSocket(userId);
+  }
+
+  if (!userId && prevUserId) {
+    disconnectSocket();
+  }
+});
+
+useAuthStore.persist.onFinishHydration((state) => {
+  const userId = state.user?.id;
+  if (userId) {
+    connectSocket(userId);
+  }
 });

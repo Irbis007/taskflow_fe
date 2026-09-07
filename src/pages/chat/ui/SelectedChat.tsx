@@ -1,22 +1,26 @@
 import { IoIosSearch } from "react-icons/io";
-import { BsPinAngle, BsThreeDots } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
 import { LuPaperclip } from "react-icons/lu";
 import { FaRegSmile } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
 import { Input, Spinner } from "@shared/ui";
-import { socket } from "@shared/services";
+// import { socket } from "@shared/services";
 import { useEffect, useRef, useState } from "react";
-import { $userHooks } from "@entities/user/api";
 import { useAuthStore } from "@shared/models";
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { getInitials } from "@shared/utils";
+import { PiPushPin, PiPushPinSlash } from "react-icons/pi";
+import { socket } from "@shared/services";
+import { $chatHooks } from "@entities/chat/api";
 
 export function SelectedChat() {
   const chatId = useParams()?.chatId || "";
   const user = useAuthStore((state) => state.user);
   const { data: chatData, isLoading: isChatLoading } =
-    $userHooks.getChat(chatId);
+    $chatHooks.getChat(chatId);
+  const { mutateAsync: updateChat, isPending: isChatUpdating } =
+    $chatHooks.editChat(chatId);
 
   const [messageInp, setMessageInp] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -36,13 +40,13 @@ export function SelectedChat() {
     if (!isChatLoading) scrollToBottom();
   }, [isChatLoading, chatId]);
 
-  socket.on("typing:start", ({ userId, chatId }) => {
-    if (chatData?.chatId === chatId && userId != user?.id) {
+  socket?.on("typing:start", ({ userId, chatId }) => {
+    if (chatData?.id === chatId && userId != user?.id) {
       setIsTyping(true);
     }
   });
-  socket.on("typing:end", ({ userId, chatId }) => {
-    if (chatData?.chatId === chatId && userId != user?.id) {
+  socket?.on("typing:end", ({ userId, chatId }) => {
+    if (chatData?.id === chatId && userId != user?.id) {
       setIsTyping(false);
     }
   });
@@ -51,14 +55,14 @@ export function SelectedChat() {
 
   useEffect(() => {
     if (typing) {
-      socket.emit("typing:start", {
+      socket?.emit("typing:start", {
         companionId: chatData?.companion.id,
-        chatId: chatData?.chatId,
+        chatId: chatData?.id,
       });
     } else {
-      socket.emit("typing:end", {
+      socket?.emit("typing:end", {
         companionId: chatData?.companion.id,
-        chatId: chatData?.chatId,
+        chatId: chatData?.id,
       });
     }
   }, [typing, chatData]);
@@ -70,7 +74,7 @@ export function SelectedChat() {
     return "Chat";
   }
 
-  const initials = getInitials(chatData.companion);
+  const initials = getInitials(chatData?.companion);
 
   return (
     <div className="grow flex flex-col">
@@ -87,22 +91,33 @@ export function SelectedChat() {
           <div className="p-2 bg-elevated border border-default rounded-lg text-secondary cursor-pointer transition-colors duration-300 hover:bg-surface">
             <IoIosSearch size={20} />
           </div>
-          <div className="p-2 bg-elevated border border-default rounded-lg text-secondary cursor-pointer transition-colors duration-300 hover:bg-surface">
-            <BsPinAngle size={20} />
+          <div
+            onClick={() => {
+              updateChat({ pinned: !chatData.pinned });
+            }}
+            className="p-2 bg-elevated border border-default rounded-lg text-secondary cursor-pointer transition-colors duration-300 hover:bg-surface"
+          >
+            {isChatUpdating ? (
+              <Spinner center />
+            ) : chatData.pinned ? (
+              <PiPushPinSlash size={20} />
+            ) : (
+              <PiPushPin size={20} />
+            )}
           </div>
           <div className="p-2 bg-elevated border border-default rounded-lg text-secondary cursor-pointer transition-colors duration-300 hover:bg-surface">
             <BsThreeDots size={20} />
           </div>
         </div>
       </div>
-      <div className="space-y-4 p-6 w-full grow overflow-auto">
+      <div className="p-6 w-full grow overflow-auto">
         {chatData.messages.map((item) => {
           const initials = getInitials(item.author);
           const isMine = item.author.id === user?.id;
           return (
             <div
               key={item.id}
-              className={`flex gap-2 ${isMine ? "ml-auto flex-row-reverse" : ""}`}
+              className={`flex gap-2 mb-4 ${isMine ? "ml-auto flex-row-reverse" : ""}`}
             >
               <div
                 className={`flex items-center justify-center w-11 h-11 rounded-full ${isMine ? "text-accent bg-accent/20" : "text-success bg-success/20"}`}
@@ -136,6 +151,11 @@ export function SelectedChat() {
             </div>
           );
         })}
+        {!chatData.messages.length && !isTyping && (
+          <div className="flex items-center justify-center h-full">
+            There is no messages, start dialog with {chatData.chatName}
+          </div>
+        )}
         {isTyping && (
           <div className={`flex gap-2`}>
             <div className="">
@@ -147,6 +167,7 @@ export function SelectedChat() {
             </div>
           </div>
         )}
+
         <div ref={bottomRef}></div>
       </div>
       <div className="shrink-0 w-full px-4 py-2 bg-surface">
@@ -166,11 +187,12 @@ export function SelectedChat() {
           <button
             onClick={() => {
               setIsLoading(true);
-              socket.emit(
+              console.log(socket);
+              socket?.emit(
                 "message:send",
                 {
                   message: messageInp,
-                  chatId: chatData.chatId,
+                  chatId: chatData.id,
                 },
                 () => {
                   scrollToBottom();
