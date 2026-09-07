@@ -6,10 +6,17 @@ interface Props {
   value: string;
   onChange: (val: string) => void;
   isActivatable?: boolean;
-  iconPos?: 'left' | "right"
+  iconPos?: "left" | "right";
+  onSearch?: () => void;
 }
 
-export function SearchInput({ value, onChange, isActivatable, iconPos = 'right'}: Props) {
+export function SearchInput({
+  value,
+  onChange,
+  onSearch,
+  isActivatable,
+  iconPos = "right",
+}: Props) {
   const [isActive, setIsActive] = useState(false);
   const btnRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -17,7 +24,7 @@ export function SearchInput({ value, onChange, isActivatable, iconPos = 'right'}
 
   return (
     <div
-      className={`flex items-center px-2 py-1 bg-elevated border border-default rounded-lg cursor-pointer ${iconPos === 'left' && "flex-row-reverse"}`}
+      className={`flex items-center px-2 py-1 bg-elevated border border-default rounded-lg cursor-pointer ${iconPos === "left" && "flex-row-reverse"}`}
       onClick={() => inputRef?.current?.focus()}
     >
       <input
@@ -32,6 +39,7 @@ export function SearchInput({ value, onChange, isActivatable, iconPos = 'right'}
       />
       <div
         className="text-secondary p-1 flex justify-center items-center rounded-full transition-colors duration-300 hover:bg-accent/20"
+        onClick={onSearch}
       >
         <IoIosSearch size={24} />
       </div>

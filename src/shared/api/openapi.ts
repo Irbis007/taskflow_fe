@@ -846,6 +846,7 @@ export interface paths {
                                 assignedTasks: number;
                             }[];
                             lastActivities: components["schemas"]["ActivityOutput"][];
+                            chatId: string;
                         };
                     };
                 };
@@ -856,7 +857,65 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name: string;
+                        surname: string;
+                        /** @enum {string} */
+                        role: "Member" | "Admin";
+                        timeZone?: string;
+                        location?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 200 OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            name: string;
+                            surname: string;
+                            email: string;
+                            color: string;
+                            id: string;
+                            /** @enum {string} */
+                            role: "Member" | "Admin";
+                            location: string;
+                            timeZone: string;
+                            joinedDate: string;
+                            lastActivityTime: string;
+                            tasksDone: number;
+                            projectsCount: number;
+                            completedTasksRate: number;
+                            roleTitle: string;
+                            projects: {
+                                id: string;
+                                color: components["schemas"]["Colors"];
+                                name: string;
+                                /** @enum {string} */
+                                projectRole: "Lead" | "Member";
+                                assignedTasks: number;
+                            }[];
+                            lastActivities: components["schemas"]["ActivityOutput"][];
+                            chatId: string;
+                        };
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/api/chats": {
@@ -868,7 +927,9 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    name?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -910,7 +971,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Chat"];
+                        "application/json": components["schemas"]["ChatItem"];
                     };
                 };
             };
@@ -957,7 +1018,35 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        chatName?: string;
+                        pinned?: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description 200 OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Chat"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/api/chats/{id}/messages": {
@@ -1244,9 +1333,9 @@ export interface components {
                 chatId: string;
                 id: string;
             };
-            lastMessageDate: string;
-            chatId: string;
+            id: string;
             companion: components["schemas"]["UserOutput"];
+            pinned: boolean;
         };
         Chat: {
             companion: components["schemas"]["UserOutput"];
@@ -1261,7 +1350,10 @@ export interface components {
                 id: string;
             }[];
             chatName: string;
-            chatId: string;
+            id: string;
+            pinned: boolean;
+            createdAt: string;
+            updatedAt: string;
         };
         TagOutput: {
             name: string;

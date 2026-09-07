@@ -1,6 +1,6 @@
 import { SearchInput } from "@shared/ui";
 import { getInitials } from "@shared/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TbUserPlus } from "react-icons/tb";
 import { $userHooks } from "@entities/user/api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,9 +20,6 @@ export function UsersList() {
     (u) => u.role === activeFilter || activeFilter === "All",
   );
 
-  useEffect(() => {
-    if (users.length) navigate(users[0].id);
-  }, [users, navigate]);
 
   return (
     <div className="shrink-0 w-80 h-full border-r border-default">

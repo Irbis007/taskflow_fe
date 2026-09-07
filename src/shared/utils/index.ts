@@ -7,3 +7,4 @@ export { getQueryKey } from "./getQueryKey";
 export { setQueryDataWithPartialQueryKey } from "./setQueryDataWithPartialQueryKey";
 export { compareArrays } from "./compareArrays";
 export { getLastMessageDate } from "./getLastMessageDate";
+export { replaceItemInArray } from "./replaceItemInArray";

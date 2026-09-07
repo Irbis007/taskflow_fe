@@ -1,12 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-type User = {
-  name: string;
-  surname: string;
-  email: string;
-  id: string;
-};
+import { User } from "../types";
 
 type AuthStore = {
   isAuth: boolean;
