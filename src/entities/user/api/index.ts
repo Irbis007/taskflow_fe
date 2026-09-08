@@ -67,9 +67,18 @@ const useGetUsersAvailableForChat = (
   return $api.useQuery("get", "/api/chats", { params: { query: queryParams } });
 };
 
+const useInviteUser = () => {
+  const mutation = $api.useMutation("post", "/api/users/invite");
+  return {
+    ...mutation,
+    mutateAsync: (data: BodyRequestType<"post", "/api/users/invite">) =>
+      mutation.mutateAsync({ body: data }),
+  };
+};
 export const $userHooks = {
   getAll: useGetUsers,
   getOne: useGetUser,
   getForChat: useGetUsersAvailableForChat,
   edit: useEditUser,
+  invite: useInviteUser,
 };

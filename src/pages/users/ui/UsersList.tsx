@@ -1,10 +1,12 @@
-import { SearchInput } from "@shared/ui";
+import { Button, CardWrapper, Input, Overview, SearchInput } from "@shared/ui";
 import { getInitials } from "@shared/utils";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TbUserPlus } from "react-icons/tb";
 import { $userHooks } from "@entities/user/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { URLS } from "@shared/consts";
+import { useClickOutside } from "@shared/libs";
+import { useForm } from "@tanstack/react-form";
 
 const filterBtns = ["All", "Admin", "Member"] as const;
 
@@ -15,17 +17,20 @@ export function UsersList() {
   const [activeFilter, setActiveFilter] =
     useState<(typeof filterBtns)[number]>("All");
   const [search, setSearch] = useState("");
+  const [isActiveInviteModal, setIsActiveInviteModal] = useState(false);
 
   const filteredUsers = users.filter(
     (u) => u.role === activeFilter || activeFilter === "All",
   );
 
-
   return (
     <div className="shrink-0 w-80 h-full border-r border-default">
       <div className="flex items-center justify-between py-6 px-4 border-b border-default text-lg font-bold">
         <span>Team - 8</span>
-        <button className="flex gap-2 items-center px-2 py-1 rounded-md bg-accent text-sm font-normal cursor-pointer transition-colors duration-300 hover:bg-accent/60">
+        <button
+          onClick={() => setIsActiveInviteModal(true)}
+          className="flex gap-2 items-center px-2 py-1 rounded-md bg-accent text-sm font-normal cursor-pointer transition-colors duration-300 hover:bg-accent/60"
+        >
           <TbUserPlus size={16} /> Invite
         </button>
       </div>
@@ -80,6 +85,53 @@ export function UsersList() {
           })}
         </div>
       </div>
+      {isActiveInviteModal && (
+        <InviteUserModal setIsActive={setIsActiveInviteModal} />
+      )}
     </div>
   );
 }
+
+const InviteUserModal = ({
+  setIsActive,
+}: {
+  setIsActive: (val: boolean) => void;
+}) => {
+  const { mutateAsync: inviteUser, isPending } = $userHooks.invite();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  useClickOutside(modalRef, () => setIsActive(false));
+  const form = useForm({
+    defaultValues: {
+      email: "",
+    },
+    onSubmit({ value }) {
+      inviteUser(value).then(() => setIsActive(false));
+    },
+  });
+  return (
+    <Overview className="flex items-center justify-center">
+      <CardWrapper className="w-100" ref={modalRef}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-4"
+        >
+          <div className="text-2xl font-bold">Invite User</div>
+          <form.Field
+            name="email"
+            children={(field) => (
+              <Input
+                value={field.state.value}
+                onChange={field.handleChange}
+                placeholder="Email"
+              />
+            )}
+          />
+          <Button title="Invite" isLoading={isPending} />
+        </form>
+      </CardWrapper>
+    </Overview>
+  );
+};
