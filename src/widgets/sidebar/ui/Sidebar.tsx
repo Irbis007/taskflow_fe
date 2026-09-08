@@ -1,5 +1,6 @@
 import { URLS } from "@shared/consts";
 import { useAuthStore } from "@shared/models";
+import { getInitials } from "@shared/utils";
 import { AiOutlineHome } from "react-icons/ai";
 import { BsChat } from "react-icons/bs";
 import { FaRegFolder } from "react-icons/fa";
@@ -10,9 +11,9 @@ import { TbLayoutKanban } from "react-icons/tb";
 import { Link, NavLink } from "react-router-dom";
 
 export function Sidebar() {
-  const clearAuth = useAuthStore(state => state.clearAuth)
-  const user = useAuthStore(state => state.user)
-  
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const user = useAuthStore((state) => state.user);
+
   return (
     <div className="flex flex-col shrink-0 w-3xs bg-surface border-r border-default">
       <Link to={"/"} className="flex items-center gap-5 ml-2 p-3">
@@ -86,12 +87,14 @@ export function Sidebar() {
         </div>
       </div>
       <div className="w-full border-t border-default pt-4 pb-8 px-3">
-        <div onClick={() => clearAuth()}  className="flex gap-2">
+        <div onClick={() => clearAuth()} className="flex gap-2">
           <div className="content-center text-accent w-12 h-12 rounded-full bg-accent/30">
-            KS
+            {!!user && getInitials(user)}
           </div>
           <div>
-            <div className="text-primary">{user?.name} {user?.surname}</div>
+            <div className="text-primary">
+              {user?.name} {user?.surname}
+            </div>
             <div className="text-secondary">Admin</div>
           </div>
         </div>

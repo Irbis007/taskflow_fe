@@ -1,5 +1,5 @@
 import { $api } from "@shared/api";
-import { BodyRequestType } from "@shared/models";
+import { BodyRequestType, useAuthStore } from "@shared/models";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   replaceItemInArray,
@@ -13,8 +13,10 @@ const useGetUsers = () => {
 
 const useEditUser = (id: string) => {
   const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
   const mutation = $api.useMutation("patch", "/api/users/{id}", {
     onSuccess(editedUser) {
+      setUser(editedUser);
       setQueryDataWithPartialQueryKey({
         method: "get",
         path: "/api/users/{id}",
