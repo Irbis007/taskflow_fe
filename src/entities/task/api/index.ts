@@ -206,6 +206,36 @@ const useGetActivity = (id: string) => {
   });
 };
 
+const useDeleteTask = (id: string) => {
+  const queryClient = useQueryClient();
+  const mutation = $api.useMutation("delete", "/api/tasks/{id}", {
+    onSuccess() {
+      setQueryDataWithPartialQueryKey({
+        method: "get",
+        path: "/api/tasks",
+        queryClient,
+        updater(prev) {
+          if (!prev) return prev;
+
+          return prev.filter((t) => t.id !== id);
+        },
+      });
+    },
+  });
+
+  return {
+    ...mutation,
+    mutateAsync: () =>
+      mutation.mutateAsync({
+        params: {
+          path: {
+            id,
+          },
+        },
+      }),
+  };
+};
+
 export const $taskHooks = {
   getTasks,
   createTask: useCreateTask,
@@ -214,4 +244,5 @@ export const $taskHooks = {
   getComments: useGetComments,
   createComment: useCreateComment,
   getActivity: useGetActivity,
+  deleteTask: useDeleteTask,
 };

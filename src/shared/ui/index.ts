@@ -9,3 +9,4 @@ export { OutlinedButton } from "./OutlinedButton";
 export { Textarea } from "./Textarea";
 export { CalendarPicker } from "./CalendarPicker";
 export { Spinner } from "./Spinner";
+export { DropdownMenu } from "./DropdownMenu";

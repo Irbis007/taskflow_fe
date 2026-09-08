@@ -12,7 +12,7 @@ export const CardWrapper = ({ className, children, ...props }: Props) => {
     <div
       {...props}
       className={twMerge(
-        `bg-surface p-3 border border-default rounded-xl`,
+        `bg-surface p-3 border border-default rounded-xl overflow-hidden`,
         className,
       )}
     >

@@ -1,8 +1,11 @@
 import { UserAvatar } from "@entities";
+import { $taskHooks } from "@entities/task";
 import { URLS } from "@shared/consts";
 import type { KanbanTask } from "@shared/models";
+import { DropdownMenu } from "@shared/ui";
 import { getPriorityColor } from "@shared/utils";
 import dayjs from "dayjs";
+import { useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { LuCalendar } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -17,14 +20,17 @@ export function KanbanCard({
   author,
   totalSubtasks,
   completedSubtasks,
+  status
 }: KanbanTask) {
   // const userInitials = getInitials(author.name, author.surname);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const {mutateAsync: deleteTask, isPending} = $taskHooks.deleteTask(id)
   const navigate = useNavigate();
   const priorityColor = getPriorityColor(priority);
   const progressBarW = (completedSubtasks * 100) / totalSubtasks;
   return (
     <div
-      className="px-3 py-2 border border-default bg-surface hover:border-accent
+      className="px-3 py-2 border border-default bg-surface [&:hover:not(:has(.dropdown:hover))]:border-accent
      cursor-pointer rounded-xl transition-colors duration-300"
       onClick={() => navigate(`${URLS.task.default}/${id}`)}
     >
@@ -39,13 +45,29 @@ export function KanbanCard({
           {priority}
         </div>
         <div
-          className="flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-300 
+          className="relative flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-300 
           text-muted hover:text-accent hover:bg-accent/20"
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          <BsThreeDots size={24} />
+          <BsThreeDots size={24} onClick={() => setIsMenuOpen(true)} />
+          <DropdownMenu
+            isActive={isMenuOpen}
+            setIsActive={setIsMenuOpen}
+            options={[
+              {
+                label: "Delete",
+                className: "text-red-400",
+                onClick() {
+                  deleteTask().then(() => setIsMenuOpen(false));
+                },
+                disableCloseByCLick: true,
+                isLoading: isPending,
+                disabled: status === 'Done'
+              },
+            ]}
+          />
         </div>
       </div>
       <div className="text-primary text-lg font-bold text-wrap">{title}</div>
