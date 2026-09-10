@@ -139,6 +139,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            projects: {
+                                total: number;
+                                difference: number;
+                            };
+                            taskActivity: {
+                                total: number;
+                                difference: number;
+                            };
+                            inProgress: {
+                                total: number;
+                                difference: number;
+                            };
+                            members: {
+                                total: number;
+                                difference: number;
+                            };
+                            tasksByStatus: {
+                                backlog?: number;
+                                todo?: number;
+                                inProgress?: number;
+                                review?: number;
+                                done?: number;
+                            };
+                            weekActivity: {
+                                Mon: number;
+                                Tue: number;
+                                Wed: number;
+                                Tho: number;
+                                Fri: number;
+                                Sun: number;
+                                Sat: number;
+                            };
+                            recentTask: {
+                                title: string;
+                                priority: components["schemas"]["Priority"];
+                                id: string;
+                            }[];
+                            lastActivity: components["schemas"]["ActivityOutput"][];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tasks": {
         parameters: {
             query?: never;

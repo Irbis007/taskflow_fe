@@ -1,28 +1,21 @@
+import { BodyResponseType } from "@shared/models";
 import { CardWrapper } from "@shared/ui";
 import { Link } from "react-router-dom";
 
-const activity = {
-  Mon: 12,
-  Tue: 17,
-  Wed: 8,
-  Tho: 20,
-  Fri: 14,
-  Sat: 5,
-  Sun: 3,
-};
+type Activity = BodyResponseType<"get", "/api/dashboard">["weekActivity"];
 
-const maxActivity = Math.max(...Object.values(activity));
-
-const getPercentWidth = (val: number) => {
-  return (val * 100) / maxActivity;
-};
-
-export function WeekActivity() {
+export function WeekActivity({ activity }: { activity: Activity }) {
+  const maxActivity = Math.max(...Object.values(activity));
+  const getPercentWidth = (val: number) => {
+    return (val * 100) / maxActivity;
+  };
   return (
     <CardWrapper className="grow">
       <div className="flex justify-between">
         <div className="text-xl font-bold">Activity this week</div>
-        <Link className="link" to={"/"}>See all</Link>
+        <Link className="link" to={"/"}>
+          See all
+        </Link>
       </div>
       <div className="space-y-2 mt-3">
         {Object.entries(activity).map(([key, value]) => (

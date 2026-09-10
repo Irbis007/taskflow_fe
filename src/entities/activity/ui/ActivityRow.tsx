@@ -1,3 +1,4 @@
+import { UserAvatar } from "@entities/user";
 import { Activity } from "@shared/models";
 import { getRgbColor } from "@shared/utils";
 import dayjs from "dayjs";
@@ -8,6 +9,7 @@ import { LuMessageSquareText } from "react-icons/lu";
 
 type Props = {
   activity: Activity;
+  type?: "default" | "simple";
 };
 
 const getColorByActivity = (
@@ -48,7 +50,7 @@ const getIconByAction = (
   }
 };
 
-export const ActivityRow = ({ activity }: Props) => {
+export const ActivityRow = ({ activity, type = "default" }: Props) => {
   const {
     action,
     author,
@@ -63,19 +65,26 @@ export const ActivityRow = ({ activity }: Props) => {
   const color = getColorByActivity(action, entityType);
   return (
     <div className="flex items-center gap-2">
-      <div
-        style={{
-          color: getRgbColor(color),
-          background: getRgbColor(color, 0.2),
-        }}
-        className="p-2 rounded-lg w-max shrink-0"
-      >
-        {icon}
-      </div>
+      {type === "default" ? (
+        <div
+          style={{
+            color: getRgbColor(color),
+            background: getRgbColor(color, 0.2),
+          }}
+          className="p-2 rounded-lg w-max shrink-0"
+        >
+          {icon}
+        </div>
+      ) : (
+        <UserAvatar user={author} />
+      )}
       <div className="grow flex gap-2">
-        <span className="font-500">
-          {author.name} {author.surname.charAt(0)}.
-        </span>
+        {type === "default" && (
+          <span className="font-500">
+            {author.name} {author.surname.charAt(0)}.
+          </span>
+        )}
+
         <span className="text-muted">
           {action}
           {!!metadata?.from && metadata.from}
@@ -87,7 +96,9 @@ export const ActivityRow = ({ activity }: Props) => {
         </span>
         <span className="text-muted">{!!metadata?.to && metadata.to}</span>
       </div>
-      <div className="text-sm text-muted">{dayjs(createdAt).format('MMMM DD YYYY, HH:mm')}</div>
+      <div className="text-sm text-muted">
+        {dayjs(createdAt).format("MMMM DD YYYY, HH:mm")}
+      </div>
     </div>
   );
 };
