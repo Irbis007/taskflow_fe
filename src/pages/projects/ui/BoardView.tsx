@@ -3,6 +3,7 @@ import { BsThreeDots } from "react-icons/bs";
 import type { Project } from "@shared/models";
 import { useNavigate } from "react-router-dom";
 import { URLS } from "@shared/consts";
+import { getIconByLabel } from "@shared/utils";
 
 interface Props {
   data: Project[];
@@ -23,7 +24,6 @@ interface CardProps {
 }
 
 const ProjectCard = ({ project }: CardProps) => {
-  const progress = 0;
   const navigate = useNavigate();
   return (
     <CardWrapper
@@ -43,7 +43,9 @@ const ProjectCard = ({ project }: CardProps) => {
             }}
             className="p-2.5 rounded-lg w-max"
           >
-            {/* <project.icon size={18} /> */}
+            {
+              getIconByLabel(project.icon)
+            }
           </div>
           <div className="w-max p-2 rounded-full  text-secondary cursor-pointer hover:bg-accent/20">
             <BsThreeDots />
@@ -54,12 +56,12 @@ const ProjectCard = ({ project }: CardProps) => {
         <div className="">
           <div className="flex justify-between items-center mt-2 text-muted text-sm">
             <span>Progress</span>
-            <span>{progress}%</span>
+            <span>{project.progress}%</span>
           </div>
           <div className="relative w-full mt-1 h-1 rounded-sm bg-muted">
             <div
               style={{
-                width: progress + "%",
+                width: project.progress + "%",
                 background: `rgb(var(--${project.color}-rgb))`,
               }}
               className="absolute top-0 left-0 h-1 rounded-sm"

@@ -1,5 +1,9 @@
 import { BsThreeDots } from "react-icons/bs";
 import type { Project } from "@shared/models";
+import { UserAvatar } from "@entities";
+import { useNavigate } from "react-router-dom";
+import { URLS } from "@shared/consts";
+import { getIconByLabel } from "@shared/utils";
 
 interface Props {
   data: Project[];
@@ -34,11 +38,12 @@ interface RowProps {
 }
 
 const ProjectRow = ({ project }: RowProps) => {
-  const progress = Math.floor(0);
+  const navigate = useNavigate()
   return (
     <tr
       className=" border border-default  *:py-4 *:px-2 *:border-y *:border-default rounded-r-lg
        w-full rounded-xl *:bg-surface cursor-pointer duration-300 transition-colors hover:*:bg-accent/20"
+       onClick={() => navigate(`${URLS.projects.default}/${project.id}`)}
     >
       <td className="w-10 border-l border-default rounded-l-xl">
         <div
@@ -48,7 +53,7 @@ const ProjectRow = ({ project }: RowProps) => {
           }}
           className="mx-auto p-2.5 rounded-lg w-max h-max"
         >
-          {/* <project.icon size={18} /> */}
+          {getIconByLabel(project.icon)}
         </div>
       </td>
       <td>
@@ -75,34 +80,34 @@ const ProjectRow = ({ project }: RowProps) => {
           <div className="relative w-full mt-1 h-1 rounded-sm bg-muted">
             <div
               style={{
-                width: progress + "%",
+                width: project.progress + "%",
                 background: `rgb(var(--${project.color}-rgb))`,
               }}
               className="absolute top-0 left-0 h-1 rounded-sm"
             ></div>
           </div>
-          <span className="text-muted text-sm text-nowrap">{progress} %</span>
+          <span className="text-muted text-sm text-nowrap">{project.progress} %</span>
         </div>
       </td>
 
       <td>
         <div className="flex">
           <div className="flex -space-x-1">
-            {/* {project.users.slice(0, 2).map((item, i) => (
+            {project.members.slice(0, 2).map((item, i) => (
               <UserAvatar
                 className="border-2 border-surface"
                 user={item}
                 key={i}
               />
-            ))} */}
+            ))}
           </div>
         </div>
       </td>
       <td>
-        <span className="text-secondary">0 tasks</span>
+        <span className="text-secondary">{project.totalTasks} tasks</span>
       </td>
       <td className="border-r border-default rounded-r-xl w-6">
-        <div className="w-max h-max p-2 rounded-full  text-secondary cursor-pointer hover:bg-accent/20">
+        <div onClick={(e) => e.stopPropagation()} className="w-max h-max p-2 rounded-full  text-secondary cursor-pointer hover:bg-accent/20">
           <BsThreeDots />
         </div>
       </td>
