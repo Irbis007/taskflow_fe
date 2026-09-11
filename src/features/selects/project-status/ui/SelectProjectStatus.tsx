@@ -13,7 +13,8 @@ type Props = {
 
 const options: ProjectStatus[] = [
   "Active",
-  "Planned",
+  "On hold",
+  "Done",
 ] satisfies Tuple<ProjectStatus>;
 
 export function ProjectStatusSelect({

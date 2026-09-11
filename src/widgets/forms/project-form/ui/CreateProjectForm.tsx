@@ -10,7 +10,7 @@ type Props = {
 
 export const CreateProjectForm = ({ isOpen, setIsOpen }: Props) => {
   const navigate = useNavigate();
-  const { mutateAsync, isPaused } = $projectHooks.createProject();
+  const { mutateAsync, isPending } = $projectHooks.createProject();
   return (
     <ProjectForm
       type="create"
@@ -21,7 +21,7 @@ export const CreateProjectForm = ({ isOpen, setIsOpen }: Props) => {
           navigate(`${URLS.projects.default}/${prj.id}`),
         )
       }
-      isLoading={isPaused}
+      isLoading={isPending}
     />
   );
 };

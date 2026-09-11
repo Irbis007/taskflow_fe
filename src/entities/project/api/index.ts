@@ -1,10 +1,15 @@
 import { $api } from "@shared/api";
 import type { BodyRequestType } from "@shared/models";
+import { ParametersQueryType } from "@shared/models/types/generics";
 import { setQueryDataWithPartialQueryKey } from "@shared/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
-const getAll = () => {
-  return $api.useQuery("get", "/api/projects");
+const getAll = (query: ParametersQueryType<"get", "/api/projects">) => {
+  return $api.useQuery("get", "/api/projects", {
+    params: {
+      query,
+    },
+  });
 };
 
 const getOne = (id: string) => {

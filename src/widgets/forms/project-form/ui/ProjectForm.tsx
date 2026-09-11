@@ -76,7 +76,7 @@ export function ProjectForm({
     name: defaultData?.name ?? "",
     color: defaultData?.color ?? "purple",
     icon: defaultData?.icon ?? "phone",
-    status: defaultData?.status ?? "Planned",
+    status: defaultData?.status ?? "Active",
     members: defaultData?.members?.map((item) => item.id) ?? [],
   };
 
@@ -297,6 +297,7 @@ export function ProjectForm({
           <div className="flex gap-2 justify-end">
             <OutlinedButton title="Cancel" onClick={() => setIsOpen(false)} />
             <Button
+            className="w-50"
               title={type === "create" ? "Create project" : "Edit project"}
               onClick={() => form.handleSubmit()}
               icon={<TbFolderPlus />}

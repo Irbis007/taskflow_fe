@@ -578,7 +578,10 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    status?: "Active" | "On hold" | "Done";
+                    search?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -1351,7 +1354,7 @@ export interface components {
         /** @enum {string} */
         Priority: "Low" | "Medium" | "Hight";
         /** @enum {string} */
-        ProjectStatus: "Active" | "Planned";
+        ProjectStatus: "Active" | "On hold" | "Done";
         /** @enum {string} */
         Colors: "purple" | "success" | "warning" | "danger" | "pink" | "blue";
         /** @enum {string} */

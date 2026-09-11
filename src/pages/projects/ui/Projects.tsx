@@ -3,7 +3,6 @@ import { useState, type ReactNode } from "react";
 import { AiOutlineBell } from "react-icons/ai";
 import { BiCheckCircle } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
-import { FiClock } from "react-icons/fi";
 import { IoGridOutline } from "react-icons/io5";
 import { LuArchive } from "react-icons/lu";
 import { TiEqualsOutline } from "react-icons/ti";
@@ -11,8 +10,10 @@ import { BoardView } from "./BoardView";
 import { ListView } from "./ListView";
 import { $projectHooks } from "@entities/project";
 import { CreateProjectForm } from "@widgets/forms/project-form";
+import { ProjectStatus } from "@shared/models";
+import { useDebounce } from "use-debounce";
 
-type Filter = "All" | "Active" | "Review" | "Done";
+type Filter = "All" | ProjectStatus;
 
 const filterButtons: {
   title: Filter;
@@ -27,21 +28,25 @@ const filterButtons: {
     icon: <BiCheckCircle size={20} />,
   },
   {
-    title: "Review",
-    icon: <FiClock size={20} />,
-  },
-  {
     title: "Done",
     icon: <LuArchive size={20} />,
   },
 ];
 
 export function Projects() {
-  const { data: projects = [], isLoading } = $projectHooks.getAll();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<ProjectStatus | "All">(
+    "All",
+  );
+
   const [search, setSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchDebounce] = useDebounce(search, 300)
+  const { data: projects = [], isLoading, isPending } = $projectHooks.getAll({
+    status: activeFilter !== "All" ? activeFilter : undefined,
+    search: searchDebounce,
+  });
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeView, setActiveView] = useState<"board" | "list">("board");
+
   return (
     <div className="w-full flex flex-col h-screen">
       <div className="flex p-4 border-b border-default bg-surface items-center">
@@ -88,9 +93,9 @@ export function Projects() {
         </div>
       </div>
       <div className="relative grow h-full overflow-auto">
-        {isLoading ? (
+        {isLoading || isPending ? (
           <div className="absolute inset-0 bg-base/20 flex justify-center items-center">
-            <Spinner size={50}/>
+            <Spinner size={50} />
           </div>
         ) : activeView === "board" ? (
           <BoardView data={projects} />
