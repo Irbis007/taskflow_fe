@@ -1,38 +1,60 @@
-import { CardWrapper } from "@shared/ui";
+import { CardWrapper, DropdownMenu } from "@shared/ui";
 import { BsThreeDots } from "react-icons/bs";
 import type { Project } from "@shared/models";
 import { useNavigate } from "react-router-dom";
 import { URLS } from "@shared/consts";
 import { getIconByLabel } from "@shared/utils";
+import { UserAvatar } from "@entities";
+import { useState } from "react";
+import { EditProjectForm } from "@widgets/forms/project-form";
+import { $projectHooks } from "@entities/project";
 
 interface Props {
   data: Project[];
 }
 
 export function BoardView({ data }: Props) {
+  const [projectData, setProjectData] = useState<Project>();
   return (
     <div className="grid grid-cols-2 gap-4 p-3 mt-2 overflow-auto">
       {data.map((item) => (
-        <ProjectCard key={item.id} project={item} />
+        <ProjectCard
+          key={item.id}
+          project={item}
+          setEditingProject={setProjectData}
+        />
       ))}
+      {!!projectData && (
+        <EditProjectForm
+          defaultData={projectData}
+          isOpen={!!projectData}
+          setIsOpen={() => setProjectData(undefined)}
+        />
+      )}
     </div>
   );
 }
 
 interface CardProps {
   project: Project;
+  setEditingProject: (val: Project) => void;
 }
 
-const ProjectCard = ({ project }: CardProps) => {
+const ProjectCard = ({ project, setEditingProject }: CardProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { mutateAsync: deleteProject, isPending } = $projectHooks.deleteProject(
+    project.id,
+  );
+
   return (
     <CardWrapper
-      className="p-0 overflow-hidden cursor-pointer transition-opacity duration-300 hover:opacity-80"
+      className="p-0 overflow-visible cursor-pointer transition-opacity duration-300 [&:hover:not(:has(.dropdown:hover))]:opacity-80"
       onClick={() => navigate(`${URLS.projects.default}/${project.id}`)}
     >
       <div
         style={{ background: `rgb(var(--${project.color}-rgb))` }}
-        className="w-full h-2"
+        className="w-full h-2 rounded-t-xl"
       ></div>
       <div className="p-3">
         <div className="flex justify-between items-center">
@@ -43,12 +65,36 @@ const ProjectCard = ({ project }: CardProps) => {
             }}
             className="p-2.5 rounded-lg w-max"
           >
-            {
-              getIconByLabel(project.icon)
-            }
+            {getIconByLabel(project.icon)}
           </div>
-          <div className="w-max p-2 rounded-full  text-secondary cursor-pointer hover:bg-accent/20">
-            <BsThreeDots />
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            className="relative w-max rounded-full  text-secondary cursor-pointer hover:bg-accent/20"
+          >
+            <BsThreeDots
+              onClick={() => setIsMenuOpen(true)}
+              className="p-2"
+              size={32}
+            />
+            <DropdownMenu
+              isActive={isMenuOpen}
+              setIsActive={setIsMenuOpen}
+              options={[
+                {
+                  label: "Edit",
+                  onClick: () => setEditingProject(project),
+                },
+                {
+                  label: "Delete",
+                  onClick: () => deleteProject(),
+                  disableCloseByCLick: true,
+                  isLoading: isPending,
+                  className: "text-red-400",
+                },
+              ]}
+            />
           </div>
         </div>
         <div className="text-lg font-bold mt-2">{project.name}</div>
@@ -69,13 +115,13 @@ const ProjectCard = ({ project }: CardProps) => {
           </div>
           <div className="mt-3 flex justify-between items-center">
             <div className="flex -space-x-1">
-              {/* {project.members?.map((item, i) => (
+              {project.members?.map((item, i) => (
                 <UserAvatar
                   className="border-2 border-surface"
                   user={item}
                   key={i}
                 />
-              ))} */}
+              ))}
             </div>
             <div className="flex items-center gap-2">
               <div

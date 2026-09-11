@@ -4,12 +4,17 @@ import { UserAvatar } from "@entities";
 import { useNavigate } from "react-router-dom";
 import { URLS } from "@shared/consts";
 import { getIconByLabel } from "@shared/utils";
+import { DropdownMenu } from "@shared/ui";
+import { $projectHooks } from "@entities/project";
+import { useState } from "react";
+import { EditProjectForm } from "@widgets/forms/project-form";
 
 interface Props {
   data: Project[];
 }
 
 export function ListView({ data }: Props) {
+  const [editingProject, setEditingProject] = useState<Project>();
   return (
     <div className="p-4 w-full space-y-4">
       <table className="w-full border-separate border-spacing-y-2">
@@ -25,25 +30,41 @@ export function ListView({ data }: Props) {
         </thead>
         <tbody>
           {data.map((item, i) => (
-            <ProjectRow key={i} project={item} />
+            <ProjectRow
+              key={i}
+              project={item}
+              setEditingProject={setEditingProject}
+            />
           ))}
         </tbody>
       </table>
+      {!!editingProject && (
+        <EditProjectForm
+          isOpen={!!editingProject}
+          setIsOpen={() => setEditingProject(undefined)}
+          defaultData={editingProject}
+        />
+      )}
     </div>
   );
 }
 
 interface RowProps {
   project: Project;
+  setEditingProject: (val: Project) => void;
 }
 
-const ProjectRow = ({ project }: RowProps) => {
-  const navigate = useNavigate()
+const ProjectRow = ({ project, setEditingProject }: RowProps) => {
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { mutateAsync: deleteProject, isPending } = $projectHooks.deleteProject(
+    project.id,
+  );
   return (
     <tr
       className=" border border-default  *:py-4 *:px-2 *:border-y *:border-default rounded-r-lg
        w-full rounded-xl *:bg-surface cursor-pointer duration-300 transition-colors hover:*:bg-accent/20"
-       onClick={() => navigate(`${URLS.projects.default}/${project.id}`)}
+      onClick={() => navigate(`${URLS.projects.default}/${project.id}`)}
     >
       <td className="w-10 border-l border-default rounded-l-xl">
         <div
@@ -86,7 +107,9 @@ const ProjectRow = ({ project }: RowProps) => {
               className="absolute top-0 left-0 h-1 rounded-sm"
             ></div>
           </div>
-          <span className="text-muted text-sm text-nowrap">{project.progress} %</span>
+          <span className="text-muted text-sm text-nowrap">
+            {project.progress} %
+          </span>
         </div>
       </td>
 
@@ -107,8 +130,28 @@ const ProjectRow = ({ project }: RowProps) => {
         <span className="text-secondary">{project.totalTasks} tasks</span>
       </td>
       <td className="border-r border-default rounded-r-xl w-6">
-        <div onClick={(e) => e.stopPropagation()} className="w-max h-max p-2 rounded-full  text-secondary cursor-pointer hover:bg-accent/20">
-          <BsThreeDots />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-max h-max rounded-full  text-secondary cursor-pointer hover:bg-accent/20"
+        >
+          <BsThreeDots className=" p-2" size={32} onClick={() => setIsMenuOpen(true)}/>
+          <DropdownMenu
+            isActive={isMenuOpen}
+            setIsActive={setIsMenuOpen}
+            options={[
+              {
+                label: "Edit",
+                onClick: () => setEditingProject(project),
+              },
+              {
+                label: "Delete",
+                onClick: () => deleteProject(),
+                disableCloseByCLick: true,
+                isLoading: isPending,
+                className: "text-red-400",
+              },
+            ]}
+          />
         </div>
       </td>
     </tr>
