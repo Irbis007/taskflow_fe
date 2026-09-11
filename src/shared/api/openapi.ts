@@ -139,6 +139,51 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    search?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            tasks: {
+                                title: string;
+                                id: string;
+                            }[];
+                            projects: {
+                                title: string;
+                                id: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dashboard": {
         parameters: {
             query?: never;
@@ -1441,6 +1486,8 @@ export interface components {
             deadline?: string | null;
             status: components["schemas"]["ProjectStatus"];
             members: components["schemas"]["UserOutput"][];
+            progress: number;
+            totalTasks: number;
         };
         ProjectOverview: {
             progressByCategories: {
