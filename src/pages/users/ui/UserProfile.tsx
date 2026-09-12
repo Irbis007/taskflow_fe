@@ -21,8 +21,6 @@ export function UserProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
-  console.log(owner);
-
   const form = useForm({
     defaultValues: {
       name: user?.name || "",
@@ -147,9 +145,11 @@ export function UserProfile() {
         <div className="flex justify-between">
           <div className="text-secondary text-lg">Personal info</div>
           <div className="flex items-center gap-2">
-            <div className="link" onClick={handleEdit}>
-              {!isEditing ? "Edit" : isPending ? <Spinner /> : "Save"}
-            </div>
+            {(user.id === owner?.id || owner?.role === "Admin") && (
+              <div className="link" onClick={handleEdit}>
+                {!isEditing ? "Edit" : isPending ? <Spinner /> : "Save"}
+              </div>
+            )}
             {isEditing && (
               <div
                 className="text-red-400 hover:underline cursor-pointer"

@@ -11,7 +11,6 @@ export const socket = io(BASE_URL, {
 function connectSocket(userId: string) {
   socket.auth = { userId };
   socket.connect();
-  console.log(userId);
 }
 
 function disconnectSocket() {

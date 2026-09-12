@@ -106,7 +106,6 @@ const useEditChat = (id: string) => {
               if (pinnedDiff !== 0) {
                 return pinnedDiff;
               }
-              console.log(b?.lastMessage?.createdAt || 0);
 
               return (
                 new Date(b?.lastMessage?.createdAt || 0).getTime() -

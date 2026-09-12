@@ -25,7 +25,6 @@ export function Header() {
   const user = useAuthStore((state) => state.user);
   const [isFocus, setIsFocus] = useState(false)
 
-
   return (
     <div className="flex items-center bg-surface w-full py-3 px-5 border-b border-default">
       <div className="grow text-2xl font-bold text-primary">

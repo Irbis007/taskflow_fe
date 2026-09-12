@@ -187,7 +187,6 @@ export function SelectedChat() {
           <button
             onClick={() => {
               setIsLoading(true);
-              console.log(socket);
               socket?.emit(
                 "message:send",
                 {

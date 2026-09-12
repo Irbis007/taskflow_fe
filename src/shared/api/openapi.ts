@@ -268,7 +268,7 @@ export interface paths {
             parameters: {
                 query?: {
                     priority?: "Low" | "Medium" | "Hight";
-                    assignee?: string;
+                    assignees?: string;
                     project?: string;
                 };
                 header?: never;

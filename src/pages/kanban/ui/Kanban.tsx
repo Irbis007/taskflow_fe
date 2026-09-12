@@ -39,7 +39,7 @@ export function Kanban() {
     isLoading,
   } = $taskHooks.getTasks({
     priority: selectedFilter === "Hight priority" ? "Hight" : undefined,
-    assignee: selectedFilter === "Assigned to me" ? user?.id : undefined,
+    assignees: selectedFilter === "Assigned to me" ? user?.id : undefined,
   });
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

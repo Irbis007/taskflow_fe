@@ -10,7 +10,6 @@ import { Spinner } from "@shared/ui";
 
 export function Dashboard() {
   const { data, isLoading, isPending } = $dashboardHooks.getData();
-  console.log(isLoading, isPending);
   if (isLoading || isPending) {
     return <Spinner center size={40} />;
   }

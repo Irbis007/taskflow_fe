@@ -51,7 +51,7 @@ export function Projects() {
     <div className="w-full flex flex-col h-screen">
       <div className="flex p-4 border-b border-default bg-surface items-center">
         <div className="text-xl font-bold">Projects</div>
-        <div className="px-3 py-1 rounded-3xl bg-elevated ml-2">6 total</div>
+        <div className="px-3 py-1 rounded-3xl bg-elevated ml-2">{projects.length} total</div>
         <div className="ml-auto flex gap-2">
           <div className="bg-elevated p-2 text-secondary border border-default rounded-lg hover:bg-surface cursor-pointer">
             <AiOutlineBell size={20} />
