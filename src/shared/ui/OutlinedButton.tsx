@@ -24,7 +24,7 @@ export function OutlinedButton({
       title={title}
       onClick={onClick}
       className={twMerge(
-        `bg-elevated border border-default disabled:bg-primary/20`,
+        `bg-elevated border border-default disabled:bg-primary/20 hover:bg-surface`,
         className,
       )}
       disabled={isLoading || disabled}

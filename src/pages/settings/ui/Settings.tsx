@@ -3,7 +3,7 @@ import { SettingsSidebar } from "./SettingsSidebar";
 
 export function Settings() {
   return (
-    <div className="flex w-full">
+    <div className="flex w-full h-full">
       <SettingsSidebar />
       <div className="p-6 grow overflow-auto">
         <Outlet />

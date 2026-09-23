@@ -1,16 +1,27 @@
 import { useId } from "react";
 import { twMerge } from "tailwind-merge";
 
-interface Props {
-  value?: string;
-  onChange: (val: string) => void;
+type Props = {
   className?: string;
   label?: string;
   required?: boolean;
   placeholder?: string;
-  inputClassName?: string
-  labelClassName?: string
-}
+  inputClassName?: string;
+  labelClassName?: string;
+  error?: string;
+  maxLength?: number;
+} & (
+  | {
+      type: "number";
+      value: number;
+      onChange: (val: number) => void;
+    }
+  | {
+      type?: "text";
+      value: string;
+      onChange: (val: string) => void;
+    }
+);
 export function Input({
   className,
   inputClassName,
@@ -18,6 +29,8 @@ export function Input({
   onChange,
   required,
   labelClassName,
+  error,
+  type,
   ...props
 }: Props) {
   const id = useId();
@@ -29,17 +42,28 @@ export function Input({
           {required && <span className="ml-1 text-danger">*</span>}
         </label>
       )}
-      <div className={twMerge(`bg-elevated border border-default rounded-lg`, inputClassName)}>
+      <div
+        className={twMerge(
+          `bg-elevated border rounded-lg ${error?.length ? "border-danger" : "border-default"}`,
+          inputClassName,
+        )}
+      >
         <input
           id={id}
-          type="text"
+          type={type}
           onChange={(e) => {
-            onChange(e.target.value);
+            const value = e.target.value;
+            if (type === "number") {
+              onChange(+value);
+            } else {
+              onChange(value);
+            }
           }}
-          className={"w-full outline-none p-2 text-primary"}
+          className={`w-full outline-none p-2 text-primary`}
           {...props}
         />
       </div>
+      {error?.length && <span className="text-danger text-sm">{error}</span>}
     </div>
   );
 }

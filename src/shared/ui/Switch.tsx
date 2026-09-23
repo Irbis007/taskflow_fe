@@ -1,7 +1,9 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 
-export function Switch() {
-  const [checked, setChecked] = useState(false);
+export function Switch({checked, setChecked}: {
+  checked: boolean;
+  setChecked: (val: boolean) => void;
+}) {
 
   const id = useId();
   return (
@@ -14,7 +16,7 @@ export function Switch() {
         type="checkbox"
         className="peer hidden"
         checked={checked}
-        onChange={() => setChecked((prev) => !prev)}
+        onChange={() => setChecked(!checked)}
       />
       <div className="absolute left-1 top-1/2 peer-checked:translate-x-full -translate-y-1/2 h-7 w-7 bg-white rounded-full transition-transform duration-300"></div>
     </label>

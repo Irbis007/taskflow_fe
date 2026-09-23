@@ -8,3 +8,4 @@ export { setQueryDataWithPartialQueryKey } from "./setQueryDataWithPartialQueryK
 export { compareArrays } from "./compareArrays";
 export { getLastMessageDate } from "./getLastMessageDate";
 export { replaceItemInArray } from "./replaceItemInArray";
+export { showFieldErrors } from "./showFieldError";
